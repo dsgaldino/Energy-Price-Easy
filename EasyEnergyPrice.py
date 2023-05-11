@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# # Energy Price
+# 
+# This application retrieves the price information provided by the Easy portal, 
+# starting from the requested date up to today's date. The values are transformed from MWh to KWh.
+
+# In[17]:
 
 
 import requests
@@ -10,14 +15,14 @@ import csv
 from datetime import timedelta, datetime
 
 
-# In[10]:
+# In[18]:
 
 
 # Creating the DataFrame with the original information
 df = pd.read_csv('EasyEnergyPrice.csv')
 
 
-# In[11]:
+# In[19]:
 
 
 # The earliest date in the dataset
@@ -34,7 +39,7 @@ print('Latest date found in the dataset:', max_date)
 print('Today\'s date:', today)
 
 
-# In[12]:
+# In[20]:
 
 
 # Days difference
@@ -47,7 +52,7 @@ else:
     print('The dataset is updated!')
 
 
-# In[13]:
+# In[21]:
 
 
 start_url = 'https://mijn.easyenergy.com/nl/api/tariff/getapxtariffs?startTimestamp='
@@ -55,7 +60,7 @@ middle_url = 'T00%3A00%3A00.000Z&endTimestamp='
 end_url = 'T23%3A00%3A00.000Z&grouping=%22'
 
 
-# In[14]:
+# In[22]:
 
 
 # Create a temporary DataFrame to store the daily price 
@@ -84,31 +89,39 @@ if dif_days != 0:
     # Append the information from the temporary DataFrame to the combined DataFrame
     df_comb = pd.concat([df_comb, df_tempL], ignore_index=True)
     
-# Updating the dataset with earlist dates
 
-# Adjusting dates
-min_date = min_date - timedelta(days=1)
-early_year = str(min_date.year)
-early_date = early_year + '-01-01'
-early_date_obj = datetime.strptime(early_date, '%Y-%m-%d')
+
+
+# Code for updating the dataset with earlist dates
+# 
+# - Earlist date is January 1st 2015, if nedded only withdraw the comments and run the entire code
+
+# In[25]:
+
+
+# # Adjusting dates
+# min_date = min_date - timedelta(days=1)
+# early_year = str(min_date.year)
+# early_date = early_year + '-01-01'
+# early_date_obj = datetime.strptime(early_date, '%Y-%m-%d')
     
-# Convert date to string 
-min_date_str = min_date.strftime('%Y-%m-%d')
-early_date_str = early_date_obj.strftime('%Y-%m-%d')
+# # Convert date to string 
+# min_date_str = min_date.strftime('%Y-%m-%d')
+# early_date_str = early_date_obj.strftime('%Y-%m-%d')
 
-#Creating the URL
-url = f'{start_url}{early_date_str.replace("/", "-")}{middle_url}{min_date_str.replace("/", "-")}{end_url}'
+# #Creating the URL
+# url = f'{start_url}{early_date_str.replace("/", "-")}{middle_url}{min_date_str.replace("/", "-")}{end_url}'
 
-# Copy the information from the URL into a temporary DataFrame
-response = requests.get(url)
-data = response.json()
-df_tempE = pd.DataFrame(data)
+# # Copy the information from the URL into a temporary DataFrame
+# response = requests.get(url)
+# data = response.json()
+# df_tempE = pd.DataFrame(data)
 
-# Append the information from the temporary DataFrame to the combined DataFrame
-df_comb = pd.concat([df_comb, df_tempE], ignore_index=True)
+# # Append the information from the temporary DataFrame to the combined DataFrame
+# df_comb = pd.concat([df_comb, df_tempE], ignore_index=True)
 
 
-# In[15]:
+# In[23]:
 
 
 # split Timestamp column into Date and Hour columns
@@ -129,7 +142,7 @@ df_comb = df_comb.rename(columns={
 df = pd.concat([df, df_comb], ignore_index=True)
 
 
-# In[16]:
+# In[24]:
 
 
 df.to_csv('EasyEnergyPrice.csv', index=False)
